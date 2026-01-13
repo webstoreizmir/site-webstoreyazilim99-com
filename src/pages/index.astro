@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import HeroSection from '../components/HeroSection.astro';
+import ProductSection from '../components/ProductSection.astro';
+import AboutSection from '../components/AboutSection.astro';
+import ProcessSection from '../components/ProcessSection.astro';
+import TestimonialsSection from '../components/TestimonialsSection.astro';
+import FAQSection from '../components/FAQSection.astro';
+import ContactSection from '../components/ContactSection.astro';
+import Footer from '../components/Footer.astro';
+
+// JSON dosyasını içe aktar (Veri gelmezse patlamasın diye önlem alıyoruz)
+import siteConfig from '../data/site-config.json';
+
+// --- GÜVENLİK BÖLGESİ (DEFENSIVE CODING) ---
+// JSON dosyasından veri gelmezse sitenin çökmesini engelleyen sigorta sistemi.
+
+// 1. Ana Config Kontrolü
+const rawConfig = siteConfig || {};
+
+// 2. Metadata (Başlık/Açıklama) Kontrolü
+const metadata = rawConfig.metadata || { 
+  title: "Site Hazırlanıyor", 
+  description: "Web sitemiz yapım aşamasındadır." 
+};
+
+// 3. Tema ve Font Kontrolü (HATAYI ÇÖZEN KISIM BURASI)
+// Vercel burada "heading" bulamayıp patlıyordu. Artık patlayamaz.
+const theme = rawConfig.theme || {};
+const fonts = theme.fonts || { heading: "Inter", body: "Inter" }; 
+const colors = theme.colors || {};
+
+// 4. İçerik Kontrolü
+const content = rawConfig.content || {};
+
+// Her bölüm için yedek veriler (Boş gelirse hata vermesin)
+const hero = content.hero || { headline: "", subheadline: "", ctaButtonText: "" };
+const about = content.about || { title: "", description: "", stats: [] };
+const products = content.products || []; // Dizi yoksa boş dizi ata
+const process = content.process || [];
+const testimonials = content.testimonials || [];
+const faq = content.faq || [];
+const contact = content.contact || { address: "", phone: "", email: "" };
+
+// 5. Görsel Kontrolü
+const images = rawConfig.images || {};
+const heroKeyword = images.hero_keyword || "business";
+const aboutKeyword = images.about_keyword || "office";
+
+// --- GÜVENLİK BÖLGESİ BİTİŞ ---
+---
+
+<Layout 
+  title={metadata.title} 
+  description={metadata.description}
+  headingFont={fonts.heading} 
+  bodyFont={fonts.body}
+>
+  <Navbar title={metadata.title} />
+  
+  <HeroSection 
+    headline={hero.headline}
+    subheadline={hero.subheadline}
+    ctaButtonText={hero.ctaButtonText}
+    imageKeyword={heroKeyword}
+  />
+  
+  <AboutSection 
+    title={about.title}
+    description={about.description}
+    stats={about.stats}
+    imageKeyword={aboutKeyword}
+  />
+
+  <ProductSection products={products} />
+
+  <ProcessSection steps={process} />
+  
+  <TestimonialsSection testimonials={testimonials} />
+  
+  <FAQSection faqs={faq} />
+  
+  <ContactSection contact={contact} />
+  
+  <Footer 
+    title={metadata.title}
+    description={about.description}
+    contact={contact}
+  />
+</Layout>
